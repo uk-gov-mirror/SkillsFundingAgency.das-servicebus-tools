@@ -14,8 +14,9 @@ The messages which can be published are:
 * ImportPayments
 * ImportAccountPayments
 * ProcessPeriodEndPayments
+* StoreLearningHistory
 
-All of the HttpTrigger endpoint verbs are POST. The shape of the messges are as shown below:
+The Functions app targets **.NET 10** (`net10.0`). All HttpTrigger endpoint verbs are POST. The shape of the messges are as shown below:
 
 ### DraftExpireAccountFunds
 
@@ -84,8 +85,27 @@ All of the HttpTrigger endpoint verbs are POST. The shape of the messges are as 
 ```
 
 ---
+### StoreLearningHistory
 
+Publishes `SFA.DAS.CommitmentsV2.Messages.Commands.StoreLearningHistoryCommand` to `SFA.DAS.CommitmentsV2.MessageHandlers`. The apprenticeship id must exist in that environment.
 
+```javascript
+{
+    "ApprenticeshipId": 264643,
+    "Source": 1,
+    "ChangeType": 2,
+    "AppliedDate": "2026-06-03T00:00:00",
+    "Description": "Testing from NserviceBus"
+}
+```
+
+**Source** (`LearningSourceType`): `0` Approval API, `1` ILR status change, `2` Manual change.
+
+**ChangeType** (`LearningChangeType`): `0` Auto approved, `1` Rejected, `2` Employer approved, `3` Employer rejected, `4` Manual update.
+
+Optional: `LearningKey` (GUID), `UserId` (GUID).
+
+---
 
 # Running the dead letter message requeue app
 

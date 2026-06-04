@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SFA.DAS.EmployerFinance.Messages.Commands;
+﻿namespace SFA.DAS.EmployerFinance.Messages.Commands;
 
 public class DraftExpireAccountFundsCommand
 {
