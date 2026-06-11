@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.EmployerFinance.Messages\SFA.DAS.EmployerFinance.Messages.csproj" />
     <ProjectReference Include="..\SFA.DAS.CommitmentsV2.Messages\SFA.DAS.CommitmentsV2.Messages.csproj" />
+    <ProjectReference Include="..\SFA.DAS.Learning.Messages\SFA.DAS.Learning.Messages.csproj" />
   </ItemGroup>
 
   <ItemGroup>
