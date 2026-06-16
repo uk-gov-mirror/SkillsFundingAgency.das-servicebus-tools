@@ -1,4 +1,4 @@
-namespace SFA.DAS.Learning.Types;
+﻿namespace SFA.DAS.Learning.Types;
 
 public class LearningWithdrawnEvent
 {
