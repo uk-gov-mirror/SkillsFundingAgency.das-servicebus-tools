@@ -15,6 +15,7 @@ The messages which can be published are:
 * ImportAccountPayments
 * ProcessPeriodEndPayments
 * StoreLearningHistory
+* ApprenticeshipEmployerTypeChange
 
 The Functions app targets **.NET 10** (`net10.0`). All HttpTrigger endpoint verbs are POST. The shape of the messges are as shown below:
 
@@ -104,6 +105,22 @@ Publishes `SFA.DAS.CommitmentsV2.Messages.Commands.StoreLearningHistoryCommand` 
 **ChangeType** (`LearningChangeType`): `0` Auto approved, `1` Rejected, `2` Employer approved, `3` Employer rejected, `4` Manual update.
 
 Optional: `LearningKey` (GUID), `UserId` (GUID).
+
+---
+### ApprenticeshipEmployerTypeChange
+
+Publishes `SFA.DAS.EmployerAccounts.Messages.Events.ApprenticeshipEmployerTypeChangeEvent` to the service bus. Use this spike endpoint to simulate employer account levy type changes in lower environments.
+
+```javascript
+{
+    "AccountId": 12345,
+    "ApprenticeshipEmployerType": 1
+}
+```
+
+**ApprenticeshipEmployerType** (`SFA.DAS.Common.Domain.Types.ApprenticeshipEmployerType`): `0` NonLevy, `1` Levy, `2` Unknown.
+
+Optional: `Created` (DateTime).
 
 ---
 

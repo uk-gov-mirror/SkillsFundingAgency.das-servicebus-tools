@@ -9,6 +9,7 @@ public interface IMessageProcessor
 {
     Task SendCommand<T>(FunctionContext context);
     Task SendCommand<T>(Stream requestContent, FunctionContext context);
+    Task PublishEvent<T>(Stream requestContent, FunctionContext context);
 }
 
 public class MessageProcessor(IFunctionEndpoint endpoint, ILogger<MessageProcessor> logger) : IMessageProcessor
@@ -35,6 +36,18 @@ public class MessageProcessor(IFunctionEndpoint endpoint, ILogger<MessageProcess
 
         await SendCommand(command, typeName, context);
     }
+
+    public async Task PublishEvent<T>(Stream requestContent, FunctionContext context)
+    {
+        using var reader = new StreamReader(requestContent);
+        var content = await reader.ReadToEndAsync();
+        var @event = JsonConvert.DeserializeObject<T>(content);
+        var typeName = typeof(T).ToString().Split('.').Last();
+
+        logger.LogInformation("Publishing event '{TypeName)}' with payload: {Payload}", typeName, content);
+
+        await PublishEvent(@event, typeName, context);
+    }
     
     private async Task SendCommand<T>(T command, string typeName, FunctionContext context)
     {
@@ -49,5 +62,20 @@ public class MessageProcessor(IFunctionEndpoint endpoint, ILogger<MessageProcess
         }
 
         logger.LogInformation("Message '{TypeName}' sent successfully", typeName);
+    }
+
+    private async Task PublishEvent<T>(T @event, string typeName, FunctionContext context)
+    {
+        try
+        {
+            await endpoint.Publish(@event, context);
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Failed to publish event {TypeName}.", typeName);
+            throw;
+        }
+
+        logger.LogInformation("Event '{TypeName}' published successfully", typeName);
     }
 }

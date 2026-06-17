@@ -15,7 +15,8 @@ public static class NServiceBusExtensions
             endpointConfiguration.Routing.AddRouting();
             endpointConfiguration.AdvancedConfiguration.SendFailedMessagesTo(ErrorEndpointName);
             endpointConfiguration.AdvancedConfiguration.Conventions()
-                .DefiningCommandsAs(IsCommand);
+                .DefiningCommandsAs(IsCommand)
+                .DefiningEventsAs(t => t.Name.EndsWith("Event"));
 
             if (!string.IsNullOrEmpty(config["NServiceBusLicense"]))
             {
