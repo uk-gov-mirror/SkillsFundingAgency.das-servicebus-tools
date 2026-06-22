@@ -15,6 +15,7 @@ The messages which can be published are:
 * ImportAccountPayments
 * ProcessPeriodEndPayments
 * StoreLearningHistory
+* LearningWithdrawn
 
 The Functions app targets **.NET 10** (`net10.0`). All HttpTrigger endpoint verbs are POST. The shape of the messges are as shown below:
 
@@ -104,6 +105,25 @@ Publishes `SFA.DAS.CommitmentsV2.Messages.Commands.StoreLearningHistoryCommand` 
 **ChangeType** (`LearningChangeType`): `0` Auto approved, `1` Rejected, `2` Employer approved, `3` Employer rejected, `4` Manual update.
 
 Optional: `LearningKey` (GUID), `UserId` (GUID).
+
+---
+### LearningWithdrawn
+
+Publishes `SFA.DAS.Learning.Types.LearningWithdrawnEvent` to the shared service bus. Consumed by `SFA.DAS.CommitmentsV2.ExternalHandlers`, which stops the apprenticeship via ILR withdrawal logic, publishes stop events (`IsWithdrawnViaIlr = true`), and sends `StoreLearningHistoryCommand` automatically. Use `StoreLearningHistory` instead if you only need to test audit history in isolation.
+
+The apprenticeship id must exist in that environment. `WithdrawalDate` must be the 1st of the month and cannot be in the future (unless training has not started, in which case it must equal the start date). Re-publishing for an apprenticeship already withdrawn via ILR may fail validation or produce a stop-date-changed event depending on dates.
+
+```javascript
+{
+    "ApprenticeshipId": 264643,
+    "LearningKey": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "WithdrawalDate": "2026-05-01T00:00:00",
+    "WithdrawalReasonCode": 12,
+    "Created": "2026-06-11T10:00:00"
+}
+```
+
+**WithdrawalReasonCode**: ILR withdrawal reason code stored on the apprenticeship. Code `29` sets the redundancy flag.
 
 ---
 
