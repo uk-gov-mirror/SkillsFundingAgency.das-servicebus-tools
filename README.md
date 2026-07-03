@@ -16,6 +16,8 @@ The messages which can be published are:
 * ProcessPeriodEndPayments
 * StoreLearningHistory
 * ApprenticeshipEmployerTypeChange
+* LearningWithdrawn
+* LearningPaused
 
 The Functions app targets **.NET 10** (`net10.0`). All HttpTrigger endpoint verbs are POST. The shape of the messges are as shown below:
 
@@ -121,6 +123,41 @@ Publishes `SFA.DAS.EmployerAccounts.Messages.Events.ApprenticeshipEmployerTypeCh
 **ApprenticeshipEmployerType** (`SFA.DAS.Common.Domain.Types.ApprenticeshipEmployerType`): `0` NonLevy, `1` Levy, `2` Unknown.
 
 Optional: `Created` (DateTime).
+
+---
+### LearningWithdrawn
+
+Publishes `SFA.DAS.Learning.Types.LearningWithdrawnEvent` to the shared service bus. Consumed by `SFA.DAS.CommitmentsV2.ExternalHandlers`, which stops the apprenticeship via ILR withdrawal logic, publishes stop events (`IsWithdrawnViaIlr = true`), and sends `StoreLearningHistoryCommand` automatically. Use `StoreLearningHistory` instead if you only need to test audit history in isolation.
+
+The apprenticeship id must exist in that environment. `WithdrawalDate` must be the 1st of the month and cannot be in the future (unless training has not started, in which case it must equal the start date). Re-publishing for an apprenticeship already withdrawn via ILR may fail validation or produce a stop-date-changed event depending on dates.
+
+```javascript
+{
+    "ApprenticeshipId": 264643,
+    "LearningKey": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "WithdrawalDate": "2026-05-01T00:00:00",
+    "WithdrawalReasonCode": 12,
+    "Created": "2026-06-11T10:00:00"
+}
+```
+
+**WithdrawalReasonCode**: ILR withdrawal reason code stored on the apprenticeship. Code `29` sets the redundancy flag.
+
+---
+### LearningPaused
+
+Publishes `SFA.DAS.Learning.Types.LearningPausedEvent` to the shared service bus. Consumed by `SFA.DAS.CommitmentsV2.ExternalHandlers`, which pauses the apprenticeship via ILR pause logic, publishes `ApprenticeshipPausedEvent` (`PausedViaILR = true`), and sends `StoreLearningHistoryCommand` automatically. Use `StoreLearningHistory` instead if you only need to test audit history in isolation.
+
+The apprenticeship id must exist in that environment. `PauseDate` must be on or after the apprenticeship start date and before the end date. Learning cannot be paused when payment status is Completed or Withdrawn.
+
+```javascript
+{
+    "ApprenticeshipId": 264643,
+    "LearningKey": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "PauseDate": "2026-05-01T00:00:00",
+    "Created": "2026-06-11T10:00:00"
+}
+```
 
 ---
 
