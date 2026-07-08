@@ -13,6 +13,7 @@ public static class NServiceBusExtensions
         hostBuilder.UseNServiceBus(EndpointName, (config, endpointConfiguration) =>
         {
             endpointConfiguration.Routing.AddRouting();
+            endpointConfiguration.AdvancedConfiguration.AssemblyScanner().ScanFileSystemAssemblies = false;
             endpointConfiguration.AdvancedConfiguration.SendFailedMessagesTo(ErrorEndpointName);
             endpointConfiguration.AdvancedConfiguration.Conventions()
                 .DefiningCommandsAs(IsCommand)

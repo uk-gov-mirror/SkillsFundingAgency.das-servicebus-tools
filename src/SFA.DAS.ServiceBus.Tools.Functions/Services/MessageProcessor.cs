@@ -48,7 +48,6 @@ public class MessageProcessor(IFunctionEndpoint endpoint, ILogger<MessageProcess
 
         await PublishEvent(@event, typeName, context);
     }
-
     private async Task SendCommand<T>(T command, string typeName, FunctionContext context)
     {
         try
