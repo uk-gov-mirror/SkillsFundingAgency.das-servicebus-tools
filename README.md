@@ -15,6 +15,8 @@ The messages which can be published are:
 * ImportAccountPayments
 * ProcessPeriodEndPayments
 * StoreLearningHistory
+* ApprenticeshipEmployerTypeChange
+* RefreshEmployerLevyDataCompleted
 * LearningWithdrawn
 * LearningPaused
 
@@ -106,6 +108,63 @@ Publishes `SFA.DAS.CommitmentsV2.Messages.Commands.StoreLearningHistoryCommand` 
 **ChangeType** (`LearningChangeType`): `0` Auto approved, `1` Rejected, `2` Employer approved, `3` Employer rejected, `4` Manual update.
 
 Optional: `LearningKey` (GUID), `UserId` (GUID).
+
+---
+### ApprenticeshipEmployerTypeChange
+
+Publishes `SFA.DAS.EmployerAccounts.Messages.Events.ApprenticeshipEmployerTypeChangeEvent` to the service bus. Use this spike endpoint to simulate employer account levy type changes in lower environments.
+
+```javascript
+{
+    "AccountId": 12345,
+    "ApprenticeshipEmployerType": 1
+}
+```
+
+**ApprenticeshipEmployerType** (`SFA.DAS.Common.Domain.Types.ApprenticeshipEmployerType`): `0` NonLevy, `1` Levy, `2` Unknown.
+
+Optional: `Created` (DateTime).
+
+---
+### RefreshEmployerLevyDataCompleted
+
+Publishes `SFA.DAS.EmployerFinance.Messages.Events.RefreshEmployerLevyDataCompletedEvent` to the service bus. Use this to test the employer-accounts `EmployerAccountLevyStatus` projection (APPMAN-2762) without running a full levy import.
+
+Consumed by `SFA.DAS.EmployerAccounts.MessageHandlers` → `RefreshEmployerLevyDataAccountLevyStatusProjectionHandler`.
+
+```javascript
+{
+    "AccountId": 1001,
+    "PayeRef": "123/AB45678",
+    "LastLevyDeclarationDate": "2024-03-15T00:00:00",
+    "PeriodMonth": 6,
+    "PeriodYear": "2526",
+    "LevyImported": false,
+    "LevyTransactionValue": 0,
+    "Created": "2026-06-20T10:00:00Z"
+}
+```
+
+`LastLevyDeclarationDate` is the field written to `EmployerAccountLevyStatus` and used by the dormancy assessment job. Use a date older than your configured `NoLevyDeclaredMonths` threshold to test dormant-candidate detection, or a recent date to test levy-resume cancellation of active dormancy requests.
+
+`Created` maps to `LastRefreshedAt` on the projection. Older `Created` values are ignored when a newer refresh already exists.
+
+To test a never-declared account (dormancy candidate with no historic declaration), set `LastLevyDeclarationDate` to `null`:
+
+```javascript
+{
+    "AccountId": 1001,
+    "PayeRef": "123/AB45678",
+    "LastLevyDeclarationDate": null,
+    "PeriodMonth": 6,
+    "PeriodYear": "2526",
+    "LevyImported": false,
+    "LevyTransactionValue": 0,
+    "Created": "2026-06-20T10:00:00Z"
+}
+```
+
+For a full finance import path that also publishes this event, use `ImportAccountLevyDeclarations` instead.
 
 ---
 ### LearningWithdrawn
