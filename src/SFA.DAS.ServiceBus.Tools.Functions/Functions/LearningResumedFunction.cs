@@ -1,5 +1,4 @@
 using SFA.DAS.ServiceBus.Tools.Functions.Services;
-using SFA.DAS.CommitmentsV2.ExternalHandlers.LearningEvents;
 
 namespace SFA.DAS.ServiceBus.Tools.Functions.Functions;
 
