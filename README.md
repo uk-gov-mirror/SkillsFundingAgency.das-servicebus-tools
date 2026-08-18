@@ -19,6 +19,7 @@ The messages which can be published are:
 * RefreshEmployerLevyDataCompleted
 * LearningWithdrawn
 * LearningPaused
+* LearningResumed
 
 The Functions app targets **.NET 10** (`net10.0`). All HttpTrigger endpoint verbs are POST. The shape of the messges are as shown below:
 
@@ -200,7 +201,21 @@ The apprenticeship id must exist in that environment. `PauseDate` must be on or 
     "Created": "2026-06-11T10:00:00"
 }
 ```
+---
+### LearningResumed
 
+Publishes `SFA.DAS.Learning.Types.LearningResumedEvent` to the shared service bus. Consumed by `SFA.DAS.CommitmentsV2.ExternalHandlers`, which resumes the apprenticeship via ILR resume logic, publishes `ApprenticeshipResumedEvent` (`ResumedViaILR = true`), and sends `StoreLearningHistoryCommand` automatically. Use `StoreLearningHistory` instead if you only need to test audit history in isolation.
+
+The apprenticeship id must exist in that environment. `ResumeDate` is after the apprenticeship start date and before the end date and on or after the paused date. Learning cannot be resumed when payment status is Completed or Withdrawn.
+
+```javascript
+{
+    "ApprenticeshipId": 264643,
+    "LearningKey": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "ResumeDate": "2026-06-01T00:00:00",
+    "Created": "2026-08-10T10:00:00"
+}
+```
 ---
 
 # Running the dead letter message requeue app
