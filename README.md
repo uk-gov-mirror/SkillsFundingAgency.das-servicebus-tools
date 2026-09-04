@@ -20,6 +20,7 @@ The messages which can be published are:
 * LearningWithdrawn
 * LearningPaused
 * LearningResumed
+* ApprovedLearningUpdated
 
 The Functions app targets **.NET 10** (`net10.0`). All HttpTrigger endpoint verbs are POST. The shape of the messges are as shown below:
 
