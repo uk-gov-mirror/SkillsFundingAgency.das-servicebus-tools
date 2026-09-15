@@ -20,6 +20,7 @@ The messages which can be published are:
 * LearningWithdrawn
 * LearningPaused
 * LearningResumed
+* ApprovedLearningUpdated
 
 The Functions app targets **.NET 10** (`net10.0`). All HttpTrigger endpoint verbs are POST. The shape of the messges are as shown below:
 
@@ -217,6 +218,39 @@ The apprenticeship id must exist in that environment. `ResumeDate` is after the 
 }
 ```
 ---
+### ApprovedLearningUpdated
+
+Publishes `SFA.DAS.Learning.Types.ApprovedLearningUpdatedEvent` to the shared service bus. Consumed by `SFA.DAS.CommitmentsV2.ExternalHandlers`, which updates the apprenticeship in the CommitmentsV2 DB.
+
+The apprenticeship id must exist in that environment. 
+
+```javascript
+{
+   "apprenticeshipId": 264643,
+  "learningType": "apprenticeship",
+  "learningKey": a1b2c3d4-e5f6-7890-abcd-ef1234567890,
+  "learningUri": "uri",
+  "changes": [
+    {
+      "changeType": "Firstname",
+      "data": {
+        "old": "TestFirstname",
+        "new": "TestFirstname1"
+      }
+    },
+    {
+      "changeType": "Surname",
+      "data": {
+        "old": "TestSurname",
+        "new": "TestSurname1"
+      }
+    }
+  ]
+}
+```
+---
+
+
 
 # Running the dead letter message requeue app
 
